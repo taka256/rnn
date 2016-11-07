@@ -23,8 +23,9 @@ if __name__ == '__main__':
     Xl = map(lambda X: np.sin(X), Xl)
 
     rnn = RNN(1, 4, 1)
-    rnn.fit(Xl, epsilon = 0.05, lam = 0.001, epoch = 30)
-    rnn.save()
+    rnn.train(Xl, epsilon = 0.05, lam = 0.001, epoch = 30)
+    rnn.save_param()
+    rnn.save_lossfig()
 
     st = np.random.rand() * pi
     en = st + 20 * pi

@@ -1,4 +1,5 @@
 import numpy as np
+from matplotlib import pyplot as plt
 
 class RNN(object):
 
@@ -11,8 +12,8 @@ class RNN(object):
         self.recurr_weight = np.random.randn(n_hidden, n_hidden + 1)
 
 
-    def fit(self, Xl, epsilon, lam, epoch):
-        self.__error = np.zeros(epoch)
+    def train(self, Xl, epsilon, lam, epoch):
+        self.__loss = np.zeros(epoch)
         for epo in range(epoch):
             print 'epoch: {0}'.format(epo)
             for X in np.random.permutation(Xl):
@@ -37,8 +38,8 @@ class RNN(object):
                     zs_prev = zs[t - 1] if t > 0 else np.zeros(self.n_hidden)
                     recurr_dEdw += hidden_delta.reshape(-1, 1) * np.hstack((1.0, zs_prev))
 
-                    # accumulate error
-                    self.__error[epo] += 0.5 * (ys[t] - X[t + 1]).dot((ys[t] - X[t + 1]).reshape((-1, 1))) / (tau - 1)
+                    # accumulate loss
+                    self.__loss[epo] += 0.5 * (ys[t] - X[t + 1]).dot((ys[t] - X[t + 1]).reshape((-1, 1))) / (tau - 1)
 
                 # update weights
                 self.output_weight -= epsilon * (output_dEdw + lam * self.output_weight)
@@ -46,9 +47,14 @@ class RNN(object):
                 self.recurr_weight -= epsilon * recurr_dEdw
 
 
-    def save(self, fn = 'weights.npy'):
+    def save_param(self, fn = 'weights.npy'):
         weights = {'h': self.hidden_weight, 'o': self.output_weight, 'r': self.recurr_weight}
         np.save(fn, weights)
+
+
+    def save_lossfig(self, fn = 'loss.png'):
+        plt.plot(np.arange(self.__loss.size), self.__loss)
+        plt.savefig(fn)
 
 
     @classmethod
